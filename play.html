@@ -330,6 +330,9 @@
         // Event listener for submit button in expert mode
         document.getElementById('submitExpert').addEventListener('click', () => {
             const userAnswer = document.getElementById('expertInput').value.trim().toLowerCase();
+            if (userAnswer === "") {
+                return;
+            }
             handleAnswer(userAnswer);
         });
         
@@ -441,7 +444,11 @@ function storeLevelData(level, flagDetails, timeSpent) {
             if (disableKeyPresses || isGameOver) return;// Prevent further input if game is over and when theres a bug where user can spam enter key to progress artificially
             if (event.key === 'Enter' && gameSettings.mode.toLowerCase() === 'expert mode') {
                 const userAnswer = document.getElementById('expertInput').value.trim().toLowerCase();
+                if (userAnswer === "") {
+                    return;
+                }
                 handleAnswer(userAnswer);
+                
             }
         }
 
