@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Play Game</title>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="bubble">
+            <div id="levelDisplay"></div>
+            <div class="timer">TIMER <span id="timer"></span></div>
+            <div class="flag">
+                <img id="flagImage" src="" alt="Country Flag">
+            </div>
+            <div class="options">
+                <button id="option1" class="option-button"></button>
+                <button id="option2" class="option-button"></button>
+                <button id="option3" class="option-button"></button>
+                <button id="option4" class="option-button"></button>
+                <input id="expertInput" class="expert-input" type="text" placeholder="Type here..." autocomplete="off" style="display: none;">
+                <button id="submitExpert" class="option-button" style="display: none;">Submit</button>
+            </div>
+            <div class="hint">
+                <img id="hintImage" src="pictures/redhint.png" alt="Hint" class="hint-img">
+                <p id="hintMessage"></p>
+            </div>
+            <div class="progress">
+                <span id="progress"></span>
+            </div>
+        </div>
+        <img id="modeImage" src="" alt="Mode Image" class="mode-img">
+    </div>
+    <div id="incorrectMessage" class="incorrect-message" style="display: none;">
+        <p>Better luck next time!</p>
+        <button onclick="playAgain()">Play Again</button>
+        <button onclick="goHome()">Go Home</button>    
+    </div>
+    <script>
+        
+        function playAgain() {
+            const mode = localStorage.getItem('mode');
+            const difficulty = localStorage.getItem('difficulty');
+            const time = localStorage.getItem('time');
+            const levelCount = localStorage.getItem('levelCount');
+    
+            const url = `game.html?mode=${mode}&difficulty=${difficulty}&time=${time}&levelCount=${levelCount}`;
+            window.location.href = url;
+        }
+
+        function goHome() {
+            localStorage.clear(); // Clear all saved settings
+            window.location.href = 'home.html';
+        }
+
+        function showIncorrectMessage() {
+            document.getElementById('incorrectMessage').style.display = 'block'; // Show the incorrect message div
+        }
+        function shuffleOptions(correct, options) { //defining a complex function
+            const allOptions = options.slice();
+            const correctIndex = allOptions.indexOf(correct);
+            allOptions.splice(correctIndex, 1); // Remove the correct answer from the original position
+            const randomIndex = Math.floor(Math.random() * (allOptions.length + 1));
+            allOptions.splice(randomIndex, 0, correct); // In   sert the correct answer at the new random position
+            return allOptions;                                  
+        }
+
+        const easyFlags = [
+            { src: 'easyflags/flag1.png', options: shuffleOptions('Argentina', ['Argentina', 'El Salvador', 'Greece', 'Russia']), correct: 'Argentina', hint: 'Lionel Messi is from here' },
+            { src: 'easyflags/flag2.png', options: shuffleOptions('Australia', ['New Zealand', 'Fiji', 'Australia', 'UK']), correct: 'Australia', hint: 'Lots of kangaroos' },
+            { src: 'easyflags/flag3.png', options: shuffleOptions('Brazil', ['Paraguay', 'Chile', 'Brazil', 'Peru']), correct: 'Brazil', hint: 'Football' },
+            { src: 'easyflags/flag4.png', options: shuffleOptions('Canada', ['Sweden', 'Canada', 'Norway', 'Iceland']), correct: 'Canada', hint: 'Maple syrup originates here' },
+            { src: 'easyflags/flag5.png', options: shuffleOptions('China', ['China', 'Japan', 'South Korea', 'Vietnam']), correct: 'China', hint: 'Pandas are native here' },
+            { src: 'easyflags/flag6.png', options: shuffleOptions('Fiji', ['Tonga', 'Samoa', 'Vanuatu', 'Fiji']), correct: 'Fiji', hint: 'Large Indian ethnic population' },
+            { src: 'easyflags/flag7.png', options: shuffleOptions('France', ['Belgium', 'Italy', 'Spain', 'France']), correct: 'France', hint: 'Baguettes are from here' },
+            { src: 'easyflags/flag8.png', options: shuffleOptions('Germany', ['Austria', 'Germany', 'Switzerland', 'Netherlands']), correct: 'Germany', hint: 'Frankfurters are from here' },
+            { src: 'easyflags/flag9.png', options: shuffleOptions('Greece', ['Italy', 'Turkey', 'Greece', 'Cyprus']), correct: 'Greece', hint: 'Famous for its mythology' },
+            { src: 'easyflags/flag10.png', options: shuffleOptions('India', ['Nepal', 'India', 'Bangladesh', 'Sri Lanka']), correct: 'India', hint: 'Largest population in the world' },
+            { src: 'easyflags/flag11.png', options: shuffleOptions('Ireland', ['Scotland', 'Ireland', 'Wales', 'Northern Ireland']), correct: 'Ireland', hint: 'This country experienced a potato famine' },
+            { src: 'easyflags/flag12.png', options: shuffleOptions('Italy', ['Spain', 'Italy', 'Greece', 'Portugal']), correct: 'Italy', hint: 'Pizza originates here' },
+            { src: 'easyflags/flag13.png', options: shuffleOptions('Japan', ['China', 'South Korea', 'Vietnam', 'Japan']), correct: 'Japan', hint: 'This country is famous for their cherry blossoms' },
+            { src: 'easyflags/flag14.png', options: shuffleOptions('Mexico', ['Spain', 'Colombia', 'Mexico', 'Peru']), correct: 'Mexico', hint: 'Frida Kahlo is from here' },
+            { src: 'easyflags/flag15.png', options: shuffleOptions('New Zealand', ['Australia', 'Fiji', 'New Zealand', 'Samoa']), correct: 'New Zealand', hint: 'You live here' },
+            { src: 'easyflags/flag16.png', options: shuffleOptions('Pakistan', ['India', 'Bangladesh', 'Pakistan', 'Afghanistan']), correct: 'Pakistan', hint: 'Home to the second highest peak on earth' },
+            { src: 'easyflags/flag17.png', options: shuffleOptions('Portugal', ['Spain', 'Portugal', 'Italy', 'Brazil']), correct: 'Portugal', hint: 'Ronaldo is from here' },
+            { src: 'easyflags/flag18.png', options: shuffleOptions('Russia', ['Ukraine', 'Russia', 'Belarus', 'Kazakhstan']), correct: 'Russia', hint: 'Is currently involved in a war' },
+            { src: 'easyflags/flag19.png', options: shuffleOptions('Samoa', ['Tonga', 'Fiji', 'Vanuatu', 'Samoa']), correct: 'Samoa', hint: 'Dialing code 685' },
+            { src: 'easyflags/flag20.png', options: shuffleOptions('Saudi Arabia', ['Oman', 'Yemen', 'Saudi Arabia', 'Jordan']), correct: 'Saudi Arabia', hint: 'Largest country in the Middle East' },
+            { src: 'easyflags/flag21.png', options: shuffleOptions('South Africa', ['Nigeria', 'South Africa', 'Kenya', 'Egypt']), correct: 'South Africa', hint: 'Largest ethnic European population in Africa' },
+            { src: 'easyflags/flag22.png', options: shuffleOptions('South Korea', ['Japan', 'South Korea', 'China', 'Vietnam']), correct: 'South Korea', hint: 'Large exporter of pop culture' },
+            { src: 'easyflags/flag23.png', options: shuffleOptions('Spain', ['Portugal', 'Spain', 'Italy', 'France']), correct: 'Spain', hint: 'Bull running is famous here' },
+            { src: 'easyflags/flag24.png', options: shuffleOptions('Sweden', ['Denmark', 'Norway', 'Sweden', 'Finland']), correct: 'Sweden', hint: 'Largest country in Scandinavia' },
+            { src: 'easyflags/flag25.png', options: shuffleOptions('Tonga', ['Samoa', 'Tonga', 'Fiji', 'Vanuatu']), correct: 'Tonga', hint: 'Only monarchy in Oceania' },
+            { src: 'easyflags/flag26.png', options: shuffleOptions('Turkey', ['Turkey', 'Iran', 'Iraq', 'Syria']), correct: 'Turkey', hint: 'A bird has the same name' },
+            { src: 'easyflags/flag27.png', options: shuffleOptions('UK', ['UK', 'France', 'Germany', 'Italy']), correct: 'UK', hint: 'Our monarchs are from here' },
+            { src: 'easyflags/flag28.png', options: shuffleOptions('Ukraine', ['Ukraine', 'Russia', 'Poland', 'Belarus']), correct: 'Ukraine', hint: 'They are currently in a war' },
+            { src: 'easyflags/flag29.png', options: shuffleOptions('USA', ['Canada', 'USA', 'Mexico', 'Brazil']), correct: 'USA', hint: 'They have the largest film industry in the world' },
+            { src: 'easyflags/flag30.png', options: shuffleOptions('Vietnam', ['Thailand', 'Vietnam', 'Cambodia', 'Laos']), correct: 'Vietnam', hint: 'Phở originates here' }
+        ];
+
+        const mediumFlags = [
+            { src: 'mediumflags/flag1.png', options: shuffleOptions('Angola', ['Angola', 'Mozambique', 'Guinea-Bissau', 'Cape Verde']), correct: 'Angola', hint: 'Largest Portuguese speaking population in Africa' },
+            { src: 'mediumflags/flag2.png', options: shuffleOptions('Armenia', ['Armenia', 'Georgia', 'Azerbaijan', 'Turkey']), correct: 'Armenia', hint: 'First Christian state to be established' },
+            { src: 'mediumflags/flag3.png', options: shuffleOptions('Azerbaijan', ['Kazakhstan', 'Turkmenistan', 'Uzbekistan', 'Azerbaijan']), correct: 'Azerbaijan', hint: 'Known for its oil reserves and Caspian Sea' },
+            { src: 'mediumflags/flag4.png', options: shuffleOptions('Barbados', ['Barbados', 'Bahamas', 'Jamaica', 'Trinidad and Tobago']), correct: 'Barbados', hint: 'Homeland of Rihanna' },
+            { src: 'mediumflags/flag5.png', options: shuffleOptions('Bhutan', ['Nepal', 'Bhutan', 'Bangladesh', 'Myanmar']), correct: 'Bhutan', hint: 'Land of the Thunder Dragon' },
+            { src: 'mediumflags/flag6.png', options: shuffleOptions('Bulgaria', ['Romania', 'Bulgaria', 'Serbia', 'Greece']), correct: 'Bulgaria', hint: 'Famous for its rose oil production' },
+            { src: 'mediumflags/flag7.png', options: shuffleOptions('Cameroon', ['Cameroon', 'Gabon', 'Nigeria', 'Congo']), correct: 'Cameroon', hint: 'Known for its diverse wildlife and football achievements' },
+            { src: 'mediumflags/flag8.png', options: shuffleOptions('Cambodia', ['Laos', 'Cambodia', 'Vietnam', 'Thailand']), correct: 'Cambodia', hint: 'Home to Angkor Wat' },
+            { src: 'mediumflags/flag9.png', options: shuffleOptions('Chile', ['Chile', 'Argentina', 'Uruguay', 'Paraguay']), correct: 'Chile', hint: 'Stretches along the western edge of South America' },
+            { src: 'mediumflags/flag10.png', options: shuffleOptions('Cyprus', ['Greece', 'Turkey', 'Cyprus', 'Malta']), correct: 'Cyprus', hint: 'An island nation in the eastern Mediterranean' },
+            { src: 'mediumflags/flag11.png', options: shuffleOptions('Dominican Republic', ['Jamaica', 'Haiti', 'Cuba', 'Dominican Republic']), correct: 'Dominican Republic', hint: 'Shares the island of Hispaniola with Haiti' },
+            { src: 'mediumflags/flag12.png', options: shuffleOptions('El Salvador', ['El Salvador', 'Honduras', 'Nicaragua', 'Costa Rica']), correct: 'El Salvador', hint: 'The smallest country in Central America' },
+            { src: 'mediumflags/flag13.png', options: shuffleOptions('Estonia', ['Lithuania', 'Latvia', 'Estonia', 'Finland']), correct: 'Estonia', hint: 'One of the Baltic states' },
+            { src: 'mediumflags/flag14.png', options: shuffleOptions('Finland', ['Finland', 'Norway', 'Sweden', 'Denmark']), correct: 'Finland', hint: 'Famous for its thousands of lakes and saunas' },
+            { src: 'mediumflags/flag15.png', options: shuffleOptions('Georgia', ['Armenia', 'Georgia', 'Azerbaijan', 'Turkey']), correct: 'Georgia', hint: 'Situated at the crossroads of Western Asia and Eastern Europe' },
+            { src: 'mediumflags/flag16.png', options: shuffleOptions('Ghana', ['Ghana', 'Ivory Coast', 'Nigeria', 'Senegal']), correct: 'Ghana', hint: 'Known for its rich gold resources' },
+            { src: 'mediumflags/flag17.png', options: shuffleOptions('Haiti', ['Haiti', 'Dominican Republic', 'Cuba', 'Jamaica']), correct: 'Haiti', hint: 'Located on the island of Hispaniola, shares it with the Dominican Republic' },
+            { src: 'mediumflags/flag18.png', options: shuffleOptions('Honduras', ['Honduras', 'Guatemala', 'Nicaragua', 'El Salvador']), correct: 'Honduras', hint: 'Located in Central America, known for its Mayan ruins' },
+            { src: 'mediumflags/flag19.png', options: shuffleOptions('Hungary', ['Austria', 'Hungary', 'Czech Republic', 'Slovakia']), correct: 'Hungary', hint: 'Famous for the river Danube and goulash' },
+            { src: 'mediumflags/flag20.png', options: shuffleOptions('Israel', ['Israel', 'Jordan', 'Lebanon', 'Syria']), correct: 'Israel', hint: 'The land of ancient history and the Dead Sea' },
+            { src: 'mediumflags/flag21.png', options: shuffleOptions('Laos', ['Laos', 'Cambodia', 'Vietnam', 'Thailand']), correct: 'Laos', hint: 'Landlocked country in Southeast Asia' },
+            { src: 'mediumflags/flag22.png', options: shuffleOptions('Lebanon', ['Lebanon', 'Israel', 'Jordan', 'Syria']), correct: 'Lebanon', hint: 'Known for its cedar trees and ancient ruins' },
+            { src: 'mediumflags/flag23.png', options: shuffleOptions('Mongolia', ['Mongolia', 'Kazakhstan', 'Uzbekistan', 'Kyrgyzstan']), correct: 'Mongolia', hint: 'Land of Genghis Khan and vast steppes' },
+            { src: 'mediumflags/flag24.png', options: shuffleOptions('Myanmar', ['Myanmar', 'Thailand', 'Laos', 'Bangladesh']), correct: 'Myanmar', hint: 'Previously known as Burma, famous for its golden pagodas' },
+            { src: 'mediumflags/flag25.png', options: shuffleOptions('Nepal', ['Nepal', 'Bhutan', 'Bangladesh', 'Myanmar']), correct: 'Nepal', hint: 'Home to Mount Everest' },
+            { src: 'mediumflags/flag26.png', options: shuffleOptions('Nigeria', ['Nigeria', 'Ghana', 'Cameroon', 'Ivory Coast']), correct: 'Nigeria', hint: 'Most populous country in Africa' },
+            { src: 'mediumflags/flag27.png', options: shuffleOptions('Papua New Guinea', ['Papua New Guinea', 'Fiji', 'Solomon Islands', 'Vanuatu']), correct: 'Papua New Guinea', hint: 'Located in Oceania, known for its cultural diversity' },
+            { src: 'mediumflags/flag28.png', options: shuffleOptions('Philippines', ['Philippines', 'Indonesia', 'Malaysia', 'Brunei']), correct: 'Philippines', hint: 'An archipelago in Southeast Asia with over 7,000 islands' },
+            { src: 'mediumflags/flag29.png', options: shuffleOptions('Singapore', ['Singapore', 'Malaysia', 'Brunei', 'Indonesia']), correct: 'Singapore', hint: 'A city-state known for its strict laws and cleanliness' },
+            { src: 'mediumflags/flag30.png', options: shuffleOptions('UAE', ['UAE', 'Saudi Arabia', 'Qatar', 'Kuwait']), correct: 'UAE', hint: 'Home to the tallest building in the world, Burj Khalifa' }
+        ];
+
+        const hardFlags = [
+            { src: 'hardflags/flag1.png', options: shuffleOptions('Tuvalu', ['Tuvalu', 'Fiji', 'Nauru', 'Vanuatu']), correct: 'Tuvalu', hint: 'A small island nation in the Pacific Ocean' },
+            { src: 'hardflags/flag2.png', options: shuffleOptions('Togo', ['Togo', 'Benin', 'Ghana', 'Cameroon']), correct: 'Togo', hint: 'A country in West Africa' },
+            { src: 'hardflags/flag3.png', options: shuffleOptions('Seychelles', ['Seychelles', 'Mauritius', 'Comoros', 'Maldives']), correct: 'Seychelles', hint: 'An archipelago in the Indian Ocean' },
+            { src: 'hardflags/flag4.png', options: shuffleOptions('Rwanda', ['Rwanda', 'Gabon', 'Chad', 'Senegal']), correct: 'Rwanda', hint: 'Known as the land of a thousand hills' },
+            { src: 'hardflags/flag5.png', options: shuffleOptions('Palau', ['Palau', 'Micronesia', 'Marshall Islands', 'Kiribati']), correct: 'Palau', hint: 'An island country located in the western Pacific Ocean' },
+            { src: 'hardflags/flag6.png', options: shuffleOptions('Nauru', ['Nauru', 'Tuvalu', 'Fiji', 'Kiribati']), correct: 'Nauru', hint: 'The third smallest country by area in the world' },
+            { src: 'hardflags/flag7.png', options: shuffleOptions('Guyana', ['Guyana', 'Suriname', 'Trinidad and Tobago', 'Barbados']), correct: 'Guyana', hint: 'The only English-speaking country in South America' },
+            { src: 'hardflags/flag8.png', options: shuffleOptions('Gabon', ['Gabon', 'Rwanda', 'Uganda', 'Cameroon']), correct: 'Gabon', hint: 'Located on the west coast of Central Africa' },
+            { src: 'hardflags/flag9.png', options: shuffleOptions('Djibouti', ['Djibouti', 'Eritrea', 'Somalia', 'Ethiopia']), correct: 'Djibouti', hint: 'A country located in the Horn of Africa' },
+            { src: 'hardflags/flag10.png', options: shuffleOptions('Mauritania', ['Mauritania', 'Mali', 'Niger', 'Chad']), correct: 'Mauritania', hint: 'A country in Northwest Africa' },
+            { src: 'hardflags/flag11.png', options: shuffleOptions('Mozambique', ['Mozambique', 'Angola', 'Zambia', 'Zimbabwe']), correct: 'Mozambique', hint: 'Located on the southeast coast of Africa' },
+            { src: 'hardflags/flag12.png', options: shuffleOptions('Cape Verde', ['Cape Verde', 'Sao Tome and Principe', 'Guinea-Bissau', 'Iceland']), correct: 'Cape Verde', hint: 'An island country in the central Atlantic Ocean' },
+            { src: 'hardflags/flag13.png', options: shuffleOptions('Comoros', ['Comoros', 'Mauritius', 'Madagascar', 'Seychelles']), correct: 'Comoros', hint: 'An island nation in the Indian Ocean' },
+            { src: 'hardflags/flag14.png', options: shuffleOptions('Sierra Leone', ['Sierra Leone', 'Liberia', 'Ghana', 'Guinea']), correct: 'Sierra Leone', hint: 'A country in West Africa known for its beaches' },
+            { src: 'hardflags/flag15.png', options: shuffleOptions('Tanzania', ['Tanzania', 'Kenya', 'Uganda', 'Rwanda']), correct: 'Tanzania', hint: 'Home to Mount Kilimanjaro' },
+            { src: 'hardflags/flag16.png', options: shuffleOptions('Guinea', ['Guinea', 'Senegal', 'Mali', 'Ivory Coast']), correct: 'Guinea', hint: 'A country in West Africa' },
+            { src: 'hardflags/flag17.png', options: shuffleOptions('Kyrgyzstan', ['Kyrgyzstan', 'Uzbekistan', 'Tajikistan', 'Turkmenistan']), correct: 'Kyrgyzstan', hint: 'A country in Central Asia' },
+            { src: 'hardflags/flag18.png', options: shuffleOptions('Uganda', ['Uganda', 'Kenya', 'Tanzania', 'Rwanda']), correct: 'Uganda', hint: 'Known as the Pearl of Africa' },
+            { src: 'hardflags/flag19.png', options: shuffleOptions('Burundi', ['Burundi', 'Rwanda', 'Uganda', 'Tanzania']), correct: 'Burundi', hint: 'A landlocked country in East Africa' },
+            { src: 'hardflags/flag20.png', options: shuffleOptions('Grenada', ['Grenada', 'Saint Vincent and the Grenadines', 'Saint Lucia', 'Barbados']), correct: 'Grenada', hint: 'Known as the Spice Isle' },
+            { src: 'hardflags/flag21.png', options: shuffleOptions('Saint Lucia', ['Saint Lucia', 'Saint Kitts and Nevis', 'Saint Vincent and the Grenadines', 'Barbados']), correct: 'Saint Lucia', hint: 'An island country in the Caribbean' },
+            { src: 'hardflags/flag22.png', options: shuffleOptions('Saint Kitts and Nevis', ['Saint Kitts and Nevis', 'Saint Lucia', 'Antigua and Barbuda', 'Barbados']), correct: 'Saint Kitts and Nevis', hint: 'A dual-island nation in the Caribbean' },
+            { src: 'hardflags/flag23.png', options: shuffleOptions('Turkmenistan', ['Turkmenistan', 'Uzbekistan', 'Kyrgyzstan', 'Tajikistan']), correct: 'Turkmenistan', hint: 'A country in Central Asia' },
+            { src: 'hardflags/flag24.png', options: shuffleOptions('Benin', ['Benin', 'Burkina Faso', 'Mali', 'Togo']), correct: 'Benin', hint: 'A country in West Africa' },
+            { src: 'hardflags/flag25.png', options: shuffleOptions('Liechtenstein', ['Liechtenstein', 'Luxembourg', 'Andorra', 'Monaco']), correct: 'Liechtenstein', hint: 'A tiny landlocked country in Europe' },
+            { src: 'hardflags/flag26.png', options: shuffleOptions('Eswatini', ['Eswatini', 'Lesotho', 'Botswana', 'Namibia']), correct: 'Eswatini', hint: 'Formerly known as Swaziland' },
+            { src: 'hardflags/flag27.png', options: shuffleOptions('Tajikistan', ['Tajikistan', 'Turkmenistan', 'Uzbekistan', 'Kyrgyzstan']), correct: 'Tajikistan', hint: 'A mountainous country in Central Asia' },
+            { src: 'hardflags/flag28.png', options: shuffleOptions('Namibia', ['Namibia', 'Botswana', 'Zambia', 'Zimbabwe']), correct: 'Namibia', hint: 'Known for the Namib Desert' },
+            { src: 'hardflags/flag29.png', options: shuffleOptions('Mauritius', ['Mauritius', 'Seychelles', 'Madagascar', 'Maldives']), correct: 'Mauritius', hint: 'An island nation in the Indian Ocean' },
+            { src: 'hardflags/flag30.png', options: shuffleOptions('Dominica', ['Saint Lucia', 'Saint Vincent and the Grenadines', 'Grenada', 'Dominica']), correct: 'Dominica', hint: 'An island country in the Caribbean' }
+        ];
+
+        // Variable to hold game settings and intervals
+        let maxLevels;
+        let timerDuration;
+        let flags;
+        let gameSettings = {};
+        let interval;
+
+        // Function to shuffle an array (flag and options randomizer)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Function to retrieve game settings from URL parameters
+        function getGameSettings() {
+            const params = new URLSearchParams(window.location.search);
+            for (const [key, value] of params.entries()) {
+                gameSettings[key] = value;
+                localStorage.setItem(key, value);
+            }
+            console.log('Game Settings:', gameSettings);
+            maxLevels = parseInt(gameSettings.levelCount);
+            timerDuration = parseInt(gameSettings.time.split(' ')[0]) * 1000;
+
+            // Set flags based on difficulty level
+            if (gameSettings.difficulty.toLowerCase() === 'easy') {
+                flags = shuffle(easyFlags);
+            } else if (gameSettings.difficulty.toLowerCase() === 'medium') {
+                flags = shuffle(mediumFlags);
+            } else {
+                flags = shuffle(hardFlags);
+            }
+
+            // Display the appropriate mode image
+            const modeImage = document.getElementById('modeImage');
+            if (gameSettings.mode.toLowerCase() === 'kids mode') {
+                modeImage.src = 'pictures/kidmode.png';
+                modeImage.style.display = 'block';
+                setupKidsMode();
+            } else if (gameSettings.mode.toLowerCase() === 'expert mode') {
+                modeImage.src = 'pictures/expertmode.png';
+                modeImage.style.display = 'block';
+                setupExpertMode();
+            }
+        }
+
+        // Function to display the flag and options
+        function displayFlag() {
+            const flag = flags[getCurrentLevel()];
+            storeFlagDetails(flag);
+            
+
+            document.getElementById('flagImage').src = flag.src;
+            document.getElementById('hintMessage').textContent = '';
+            document.getElementById('hintImage').onclick = () => {
+                document.getElementById('hintMessage').textContent = flag.hint;
+            };
+            document.getElementById('progress').textContent = `${getCurrentLevel() + 1}/${maxLevels}`;
+
+            if (gameSettings.mode.toLowerCase() === 'kids mode') {
+                document.getElementById('option1').textContent = flag.options[0];
+                document.getElementById('option2').textContent = flag.options[1];
+                document.getElementById('option3').textContent = flag.options[2];
+                document.getElementById('option4').textContent = flag.options[3];
+                console.log(`Displaying flag for level ${getCurrentLevel()}: ${flag.src}`);
+
+            }
+        }
+        // Function to store the flag details in localStorage
+        function storeFlagDetails(flag) {
+    const currentLevel = getCurrentLevel();
+    console.log(`Storing flag for level ${currentLevel}:`, flag);
+    localStorage.setItem(`level${currentLevel}_flag`, JSON.stringify(flag));
+}
+
+
+
+        // Function to retrieve flag details for results page
+        function getFlagDetails(level) {
+            return JSON.parse(localStorage.getItem(`level${level}_flag`));
+        }
+
+        // Function to start the timer
+        function startTimer() {
+            let timeLeft = timerDuration / 1000;
+            const timerElement = document.getElementById('timer');
+            startTime = new Date().getTime(); // Store the start time when the timer starts
+
+            timerElement.textContent = `${timeLeft}s`;
+            clearInterval(interval); // Clear any existing intervals
+            interval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    showIncorrectMessage(); 
+                }
+            }, 1000);
+        }
+
+        // Function to load the current level
+        function loadLevel() {
+            if (getCurrentLevel() < maxLevels) {
+                displayFlag();
+                document.getElementById('expertInput').value = ''; // Clear the input box
+                startTimer(); // Start the timer for each level
+            } else {
+                alert('You have completed all levels! Redirecting to results page.');
+                window.location.href = 'results.html';
+            }
+        }
+
+        // Function to get the current level from local storage
+        function getCurrentLevel() {
+            return parseInt(localStorage.getItem('currentLevel') || '0');
+        }
+
+
+
+
+        // Setup function for kids mode
+        function setupKidsMode() {
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.style.display = 'block';
+            });
+            document.getElementById('expertInput').style.display = 'none';
+            document.getElementById('submitExpert').style.display = 'none';
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        // Setup function for expert mode
+        function setupExpertMode() {
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.style.display = 'none';
+            });
+            document.getElementById('expertInput').style.display = 'block';
+            document.getElementById('submitExpert').style.display = 'block';
+            document.getElementById('expertInput').focus();
+            document.addEventListener('keypress', handleKeyPressExpert);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('currentLevel')) {
+                localStorage.setItem('currentLevel', '0');
+            }
+            getGameSettings();
+            loadLevel();
+        });
+
+        // Event listener for option buttons
+        document.querySelectorAll('.option-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                handleAnswer(event.target.textContent);
+            });
+        });
+
+        // Event listener for submit button in expert mode
+        document.getElementById('submitExpert').addEventListener('click', () => {
+            const userAnswer = document.getElementById('expertInput').value.trim().toLowerCase();
+            handleAnswer(userAnswer);
+        });
+        
+        let isGameOver = false;
+        let disableKeyPresses = false;
+        startTime = new Date().getTime(); // Store the start time when the timer starts
+
+
+// Function to handle user's answer and validate it
+function handleAnswer(userAnswer) {
+    if (disableKeyPresses) return;
+    const flag = flags[getCurrentLevel()];
+    const correctAnswer = flag.correct.trim().toLowerCase();
+    const userAnswerTrimmed = userAnswer.trim().toLowerCase();
+    const endTime = new Date().getTime(); // Capture the time when the user submits the answer
+    const elapsedTime = (endTime - startTime) / 1000; // Calculate the elapsed time in seconds  
+    console.log(`User answered: ${userAnswerTrimmed}, Correct answer: ${correctAnswer}`);
+
+    storeAnswerTime(elapsedTime); // Store the elapsed time in localStorage
+
+    if (userAnswerTrimmed === correctAnswer) {
+        updateBackgroundColour(true); // Call updateBackgroundColour with true for correct answer
+        setTimeout(() => {
+            const nextLevel = getCurrentLevel() + 1;
+            setCurrentLevel(nextLevel); // Update current level in localStorage
+            loadLevel();
+        }, 500);
+    } else {
+        updateBackgroundColour(false); // Call updateBackgroundColour with false for incorrect answer
+        clearInterval(interval); // Stop the timer
+        disableInputs(); // Disable further user input
+        isGameOver = true; 
+    }
+}
+            
+
+
+        function storeAnswerTime(time) {
+            const currentLevel = getCurrentLevel();
+            console.log(`Storing time for level ${currentLevel}: ${time.toFixed(2)} seconds`);
+
+            localStorage.setItem(`level${currentLevel}_time`, time.toFixed(2)); // Store the time for the current level
+        }
+
+        function updateBackgroundColour(isCorrect) {
+            disableKeyPresses = true;
+            if (isCorrect) {
+                document.body.className = 'correct'; // Set the background color to green for correct answer
+                setTimeout(() => {
+                    document.body.className = ''; // Reset the background color after 0.5 seconds
+                    disableKeyPresses = false;
+                }, 500);
+            } else {
+                document.body.className = 'incorrect'; // Set the background color to red for incorrect answer
+                setTimeout(() => {
+                    document.body.className = ''; // Reset the background color after 0.5 seconds
+                    disableKeyPresses = false;
+                    showIncorrectMessage(); // Show the message and buttons for incorrect answer
+                }, 500); // Wait for 0.5 seconds before resetting
+            }
+        }
+
+        function showIncorrectMessage() { 
+            document.getElementById('incorrectMessage').style.display = 'block'; // Show the incorrect message div
+        }
+
+        function storeLevelData(level, flagDetails, timeSpent) {
+            localStorage.setItem(`level${level}_flag`, JSON.stringify(flagDetails));
+            localStorage.setItem(`level${level}_time`, timeSpent);
+        }
+        function disableInputs() {
+            document.querySelectorAll('.option-button').forEach(button => {
+            button.disabled = true; // Disable all option buttons
+            })
+            document.getElementById('submitExpert').disabled = true; // Disable submit button in expert mode
+            document.getElementById('expertInput').disabled = true; // Disable input field in expert mode
+        }
+
+
+        // Function to handle key presses for kids mode
+        function handleKeyPress(event) { 
+            if (disableKeyPresses || isGameOver) return;// Prevent further input if game is over and when theres a bug where user can spam enter key to progress artificially
+            if (gameSettings.mode.toLowerCase() === 'kids mode') {
+                switch (event.key) {
+                    case '1':
+                        handleAnswer(document.getElementById('option1').textContent);
+                        break;
+                    case '2':
+                        handleAnswer(document.getElementById('option2').textContent);
+                        break;
+                    case '3':
+                        handleAnswer(document.getElementById('option3').textContent);
+                        break;
+                    case '4':
+                        handleAnswer(document.getElementById('option4').textContent);
+                        break;
+                }
+            }
+        }
+
+       
+function storeLevelData(level, flagDetails, timeSpent) {
+    localStorage.setItem(`level${level}_flag`, JSON.stringify(flagDetails));
+    localStorage.setItem(`level${level}_time`, timeSpent.toFixed(2));
+}
+
+        // Function to handle key presses for expert mode
+        function handleKeyPressExpert(event) {
+            if (disableKeyPresses || isGameOver) return;// Prevent further input if game is over and when theres a bug where user can spam enter key to progress artificially
+            if (event.key === 'Enter' && gameSettings.mode.toLowerCase() === 'expert mode') {
+                const userAnswer = document.getElementById('expertInput').value.trim().toLowerCase();
+                handleAnswer(userAnswer);
+            }
+        }
+
+                // Function to set the current level in local storage
+                function setCurrentLevel(level) {
+    localStorage.setItem('currentLevel', level);
+}
+
+        // Clear local storage on window unload
+        window.addEventListener('beforeunload', () => {
+            localStorage.removeItem('currentLevel');
+        });
+        function disableInputs() {
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.disabled = true; // Disable all option buttons
+            });
+            document.getElementById('submitExpert').disabled = true; // Disable submit button in expert mode
+            document.getElementById('expertInput').disabled = true; // Disable input field in expert mode
+}
+    </script>
+</body>
+</html>
+

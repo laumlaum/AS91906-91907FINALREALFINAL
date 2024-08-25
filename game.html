@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Game Page</title>
+</head>
+<body>
+    <div class="container">
+        <div class="bubble">Here are your game settings:</div>
+        <div id="gameSettingsDisplay" class="settings-display"></div>
+        <button id="playButton" class="play-button">Play</button>
+    </div>
+
+    <script>
+        function getGameSettings() {
+            const params = new URLSearchParams(window.location.search);
+            const gameSettings = {};
+            for (const [key, value] of params.entries()) {
+                gameSettings[key] = value;
+            }
+            return gameSettings;
+        }
+
+        function displayGameSettings(settings) {
+            const display = document.getElementById('gameSettingsDisplay');
+            for (const [key, value] of Object.entries(settings)) {
+                const settingElement = document.createElement('p');
+                settingElement.textContent = `${key}: ${value}`;
+                display.appendChild(settingElement);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameSettings = getGameSettings();
+            displayGameSettings(gameSettings);
+            document.getElementById('playButton').addEventListener('click', () => {
+                const queryString = new URLSearchParams(gameSettings).toString();
+                window.location.href = `play.html?${queryString}`;
+            });
+        });
+    </script>
+</body>
+</html>

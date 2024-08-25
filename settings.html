@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Game Settings</title>
+</head>
+<body>
+    <div class="container">
+        <div class="bubble">First, we need to shape your game settings to your liking!</div>
+        <div class="settings-grid">
+            <button id="kidsMode" class="mode-button"><img src="pictures/kidmode.png" alt="Kids Mode Icon" class="mode-icon"><span>KIDS MODE</span></button>
+            <button id="expertMode" class="mode-button"><img src="pictures/expertmode.png" alt="Expert Mode Icon" class="mode-icon"><span>EXPERT MODE</span></button>
+            <button id="easy" class="difficulty-button">EASY</button>
+            <button id="fiveSeconds" class="time-button">5 SECONDS</button>
+            <button id="medium" class="difficulty-button">MEDIUM</button>
+            <button id="tenSeconds" class="time-button">10 SECONDS</button>
+            <button id="hard" class="difficulty-button">HARD</button>
+            <button id="fifteenSeconds" class="time-button">15 SECONDS</button>
+        </div>
+        <button id="playButton" class="play-button">Play</button>
+        <div id="error-message" style="display:none;color:red;">Please select mode, difficulty, and time.</div>
+    </div>
+
+    <script>
+        const modeButtons = document.querySelectorAll('#kidsMode, #expertMode');
+        const difficultyButtons = document.querySelectorAll('#easy, #medium, #hard');
+        const timeButtons = document.querySelectorAll('#fiveSeconds, #tenSeconds, #fifteenSeconds');
+        const playButton = document.getElementById('playButton');
+        const errorMessage = document.getElementById('error-message');
+
+        let gameSettings = {
+            mode: '',
+            difficulty: '',
+            time: '',
+            levelCount: 10 // Set default level count to 10
+        };
+
+        function handleSelection(buttons, button, settingKey) {
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            gameSettings[settingKey] = button.textContent;
+            errorMessage.style.display = 'none';
+        }
+
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                handleSelection(modeButtons, button, 'mode');
+            });
+        });
+
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                handleSelection(difficultyButtons, button, 'difficulty');
+            });
+        });
+
+        timeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                handleSelection(timeButtons, button, 'time');
+            });
+        });
+
+        playButton.addEventListener('click', () => {
+            if (!gameSettings.mode || !gameSettings.difficulty || !gameSettings.time) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            const queryString = new URLSearchParams(gameSettings).toString();
+            window.location.href = `game.html?${queryString}`;
+        });
+    </script>
+</body>
+</html>

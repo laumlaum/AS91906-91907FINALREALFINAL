@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="results.css">
+    <title>Results</title>
+</head>
+<body>
+    <div class="container">
+        <div class="results-box">
+            <h1>RESULTS</h1>
+            <h2 id="congratsMessage">CONGRATS! YOU MADE IT TO LEVEL 10!</h2>
+            <div id="resultsList"></div>
+            <a id="backLink" href="home.html">Back to home</a>
+        </div>
+    </div>
+    <script>
+        function goHome() {
+            localStorage.clear();
+            window.location.href = 'home.html';
+        }
+
+        function loadResults() {
+            const resultsList = document.getElementById('resultsList');
+            const levelCount = parseInt(localStorage.getItem('levelCount') || '10'); // Assuming levelCount is 10 if not found
+            const username = localStorage.getItem('username') || 'Player'; // Default to 'Player' if no username is found
+
+            const congratsMessage = document.getElementById('congratsMessage');
+            congratsMessage.textContent = `CONGRATS ${username}! YOU MADE IT TO LEVEL 10!`;
+            
+            for (let i = 0; i < levelCount; i++) {
+                const flagDetails = JSON.parse(localStorage.getItem(`level${i}_flag`));
+                const timeSpent = localStorage.getItem(`level${i}_time`);
+
+                if (flagDetails && timeSpent) {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <img src="${flagDetails.src}" alt="Flag ${i + 1}" class="result-flag">
+                        <span class="result-time">${timeSpent}s</span>
+                    `;
+                    resultsList.appendChild(resultItem);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadResults);
+        
+    </script>
+</body>
+</html>
