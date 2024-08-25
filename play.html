@@ -264,6 +264,8 @@
                 timerElement.textContent = `${timeLeft}s`;
                 if (timeLeft <= 0) {
                     clearInterval(interval);
+                    isGameOver = true;
+                    disableInputs();
                     showIncorrectMessage(); 
                 }
             }, 1000);
@@ -338,7 +340,7 @@
 
 // Function to handle user's answer and validate it
 function handleAnswer(userAnswer) {
-    if (disableKeyPresses) return;
+    if (disableKeyPresses || isGameOver) return;    
     const flag = flags[getCurrentLevel()];
     const correctAnswer = flag.correct.trim().toLowerCase();
     const userAnswerTrimmed = userAnswer.trim().toLowerCase();
@@ -384,7 +386,7 @@ function handleAnswer(userAnswer) {
                 document.body.className = 'incorrect'; // Set the background color to red for incorrect answer
                 setTimeout(() => {
                     document.body.className = ''; // Reset the background color after 0.5 seconds
-                    disableKeyPresses = false;
+                    disableInputs();
                     showIncorrectMessage(); // Show the message and buttons for incorrect answer
                 }, 500); // Wait for 0.5 seconds before resetting
             }
