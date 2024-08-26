@@ -355,6 +355,7 @@ function handleAnswer(userAnswer) {
 
     if (userAnswerTrimmed === correctAnswer) {
         updateBackgroundColour(true); // Call updateBackgroundColour with true for correct answer
+        clearInterval(interval);
         setTimeout(() => {
             const nextLevel = getCurrentLevel() + 1;
             setCurrentLevel(nextLevel); // Update current level in localStorage
